@@ -5,11 +5,14 @@ import Link from "next/link";
 import { useAdmin } from "@/components/AdminContext";
 import { useTournament } from "@/hooks/useTournament";
 import PlayersSetupForm from "@/components/PlayersSetupForm";
-import SorteioButton from "@/components/SorteioButton";
+import DrawAnimation from "@/components/DrawAnimation";
+import TeamPicker from "@/components/TeamPicker";
+import Escudo from "@/components/Escudo";
 
 export default function HomePage() {
   const { isAdmin } = useAdmin();
-  const { players, groups, matches, knockout, loading, refetch } = useTournament();
+  const { players, groups, matches, knockout, loading, refetch } =
+    useTournament();
   const [editandoJogadores, setEditandoJogadores] = useState(false);
 
   if (loading) {
@@ -18,7 +21,9 @@ export default function HomePage() {
 
   const temJogadores = players.length === 8;
   const temGrupos = groups.length === 2;
-  const jogosFinalizados = matches.filter((m) => m.status === "finalizado").length;
+  const jogosFinalizados = matches.filter(
+    (m) => m.status === "finalizado",
+  ).length;
   const totalJogos = matches.length;
   const grupoCompleto = totalJogos > 0 && jogosFinalizados === totalJogos;
   const temMataMata = knockout.length > 0;
@@ -27,7 +32,7 @@ export default function HomePage() {
 
   async function reiniciarTorneio() {
     const ok = window.confirm(
-      "Isso apaga grupos, jogos e mata-mata (os jogadores continuam salvos). Continuar?"
+      "Isso apaga grupos, jogos e mata-mata (os jogadores continuam salvos). Continuar?",
     );
     if (!ok) return;
     await fetch("/api/reset", { method: "POST" });
@@ -74,14 +79,19 @@ export default function HomePage() {
             {players.map((p, i) => (
               <li key={p._id} className="flex items-center gap-2">
                 <span className="font-mono text-xs text-muted">{i + 1}</span>
+                <Escudo
+                  escudoUrl={p.escudoUrl}
+                  rotulo={p.time || p.nome}
+                  size={45}
+                />
                 {p.nome}
               </li>
             ))}
           </ul>
 
           {isAdmin ? (
-            <div className="mt-6 flex flex-wrap items-center gap-4">
-              <SorteioButton onDone={refetch} />
+            <div className="mt-6 space-y-4">
+              <DrawAnimation players={players} onFinished={refetch} />
               <button
                 onClick={() => setEditandoJogadores((v) => !v)}
                 className="text-sm text-muted underline decoration-dotted underline-offset-4 hover:text-chalk"
@@ -109,6 +119,49 @@ export default function HomePage() {
         </section>
       )}
 
+      {temJogadores && (
+        <section className="rounded-2xl border border-line bg-surface p-6 shadow-card">
+          <p className="text-xs font-bold uppercase tracking-widest2 text-amber">
+            Escudos
+          </p>
+          <h2 className="mt-1 font-display text-2xl tracking-wide text-chalk">
+            Time de cada jogador
+          </h2>
+          <p className="mt-1 text-sm text-muted">
+            {isAdmin
+              ? "Escolha o time de cada um pra aparecer o escudo na tabela e nos jogos."
+              : "Times escolhidos pelos jogadores para o torneio."}
+          </p>
+
+          <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+            {players.map((p) =>
+              isAdmin ? (
+                <TeamPicker key={p._id} player={p} onSaved={refetch} />
+              ) : (
+                <div
+                  key={p._id}
+                  className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3 py-2.5"
+                >
+                  <Escudo
+                    escudoUrl={p.escudoUrl}
+                    rotulo={p.time || p.nome}
+                    size={45}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-chalk">
+                      {p.nome}
+                    </p>
+                    <p className="truncate text-xs text-muted">
+                      {p.time || "Sem time definido"}
+                    </p>
+                  </div>
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+      )}
+
       {temGrupos && (
         <section className="grid gap-4 sm:grid-cols-2">
           <StatusCard
@@ -128,8 +181,8 @@ export default function HomePage() {
               temMataMata
                 ? "Chaveamento gerado"
                 : grupoCompleto
-                ? "Pronto para gerar"
-                : "Aguardando fase de grupos"
+                  ? "Pronto para gerar"
+                  : "Aguardando fase de grupos"
             }
             descricao={
               temMataMata
@@ -161,7 +214,9 @@ export default function HomePage() {
 function EmptyState({ titulo, texto }: { titulo: string; texto: string }) {
   return (
     <section className="rounded-2xl border border-dashed border-line bg-surface/50 p-8 text-center">
-      <h2 className="font-display text-2xl tracking-wide text-chalk">{titulo}</h2>
+      <h2 className="font-display text-2xl tracking-wide text-chalk">
+        {titulo}
+      </h2>
       <p className="mt-2 text-sm text-muted">{texto}</p>
     </section>
   );

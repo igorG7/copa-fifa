@@ -34,7 +34,7 @@ export default function GruposPage() {
     );
   }
 
-  const nomeById = new Map(players.map((p) => [p._id, p.nome]));
+  const nomeById = new Map(players.map((p) => [p._id, p]));
 
   return (
     <div className="space-y-10">
@@ -57,14 +57,14 @@ export default function GruposPage() {
 
         return (
           <section key={grupo._id} className="space-y-4">
-            <GroupTable nome={grupo.nome} standings={standings} />
+            <GroupTable nome={grupo.nome} standings={standings} players={groupPlayers} />
             <div className="space-y-2.5">
               {groupMatches.map((m) => (
                 <GroupMatchCard
                   key={m._id}
                   match={m}
-                  nomeMandante={nomeById.get(m.mandanteId) ?? "?"}
-                  nomeVisitante={nomeById.get(m.visitanteId) ?? "?"}
+                  mandante={nomeById.get(m.mandanteId) ?? { _id: m.mandanteId, nome: "?" }}
+                  visitante={nomeById.get(m.visitanteId) ?? { _id: m.visitanteId, nome: "?" }}
                   isAdmin={isAdmin}
                   onSaved={refetch}
                 />

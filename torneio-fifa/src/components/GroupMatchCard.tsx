@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Match } from "@/lib/types";
+import { Match, Player } from "@/lib/types";
+import Escudo from "./Escudo";
 
 export default function GroupMatchCard({
   match,
-  nomeMandante,
-  nomeVisitante,
+  mandante,
+  visitante,
   isAdmin,
   onSaved,
 }: {
   match: Match;
-  nomeMandante: string;
-  nomeVisitante: string;
+  mandante: Player;
+  visitante: Player;
   isAdmin: boolean;
   onSaved: () => void;
 }) {
@@ -45,75 +46,88 @@ export default function GroupMatchCard({
 
   return (
     <div className="rounded-xl border border-line bg-surface px-4 py-3">
-    <div className="flex items-center justify-between gap-3">
-      <div className="min-w-0 flex-1 text-right text-sm text-chalk">
-        <span className="truncate">{nomeMandante}</span>
-      </div>
-
-      {mostrarForm ? (
-        <div className="flex items-center gap-1.5">
-          <input
-            type="number"
-            min={0}
-            value={gm}
-            onChange={(e) => setGm(Math.max(0, Number(e.target.value)))}
-            className="scoreboard-digit h-9 w-11 rounded-md text-center font-mono text-base font-bold text-amber outline-none"
-          />
-          <span className="text-muted">×</span>
-          <input
-            type="number"
-            min={0}
-            value={gv}
-            onChange={(e) => setGv(Math.max(0, Number(e.target.value)))}
-            className="scoreboard-digit h-9 w-11 rounded-md text-center font-mono text-base font-bold text-amber outline-none"
-          />
-        </div>
-      ) : (
-        <div className="flex items-center gap-1.5">
-          <span
-            className={`scoreboard-digit${jogado ? "" : "-live"} flex h-9 w-11 items-center justify-center rounded-md font-mono text-base font-bold ${
-              jogado ? "text-chalk" : "text-muted"
-            }`}
-          >
-            {jogado ? match.golsMandante : "–"}
-          </span>
-          <span className="text-muted">×</span>
-          <span
-            className={`scoreboard-digit${jogado ? "" : "-live"} flex h-9 w-11 items-center justify-center rounded-md font-mono text-base font-bold ${
-              jogado ? "text-chalk" : "text-muted"
-            }`}
-          >
-            {jogado ? match.golsVisitante : "–"}
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1 text-right text-sm text-chalk">
+          <span className="flex items-center justify-end gap-2">
+            <span className="truncate">{mandante.nome}</span>
+            <Escudo
+              escudoUrl={mandante.escudoUrl}
+              rotulo={mandante.time || mandante.nome}
+              size={45}
+            />
           </span>
         </div>
-      )}
 
-      <div className="min-w-0 flex-1 text-left text-sm text-chalk">
-        <span className="truncate">{nomeVisitante}</span>
-      </div>
+        {mostrarForm ? (
+          <div className="flex items-center gap-1.5">
+            <input
+              type="number"
+              min={0}
+              value={gm}
+              onChange={(e) => setGm(Math.max(0, Number(e.target.value)))}
+              className="scoreboard-digit h-9 w-11 rounded-md text-center font-mono text-base font-bold text-amber outline-none"
+            />
+            <span className="text-muted">×</span>
+            <input
+              type="number"
+              min={0}
+              value={gv}
+              onChange={(e) => setGv(Math.max(0, Number(e.target.value)))}
+              className="scoreboard-digit h-9 w-11 rounded-md text-center font-mono text-base font-bold text-amber outline-none"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`scoreboard-digit${jogado ? "" : "-live"} flex h-9 w-11 items-center justify-center rounded-md font-mono text-base font-bold ${
+                jogado ? "text-chalk" : "text-muted"
+              }`}
+            >
+              {jogado ? match.golsMandante : "–"}
+            </span>
+            <span className="text-muted">×</span>
+            <span
+              className={`scoreboard-digit${jogado ? "" : "-live"} flex h-9 w-11 items-center justify-center rounded-md font-mono text-base font-bold ${
+                jogado ? "text-chalk" : "text-muted"
+              }`}
+            >
+              {jogado ? match.golsVisitante : "–"}
+            </span>
+          </div>
+        )}
 
-      {isAdmin && (
-        <div className="ml-1 shrink-0">
-          {mostrarForm ? (
-            <button
-              onClick={salvar}
-              disabled={saving}
-              className="rounded-md bg-amber px-2.5 py-1.5 text-xs font-bold uppercase tracking-widest2 text-pitchnight disabled:opacity-40"
-            >
-              {saving ? "..." : "Salvar"}
-            </button>
-          ) : (
-            <button
-              onClick={() => setEditando(true)}
-              className="rounded-md border border-line px-2.5 py-1.5 text-xs font-semibold text-muted hover:text-chalk"
-            >
-              Editar
-            </button>
-          )}
+        <div className="min-w-0 flex-1 text-left text-sm text-chalk">
+          <span className="flex items-center gap-2">
+            <Escudo
+              escudoUrl={visitante.escudoUrl}
+              rotulo={visitante.time || visitante.nome}
+              size={45}
+            />
+            <span className="truncate">{visitante.nome}</span>
+          </span>
         </div>
-      )}
 
-    </div>
+        {isAdmin && (
+          <div className="ml-1 shrink-0">
+            {mostrarForm ? (
+              <button
+                onClick={salvar}
+                disabled={saving}
+                className="rounded-md bg-amber px-2.5 py-1.5 text-xs font-bold uppercase tracking-widest2 text-pitchnight disabled:opacity-40"
+              >
+                {saving ? "..." : "Salvar"}
+              </button>
+            ) : (
+              <button
+                onClick={() => setEditando(true)}
+                className="rounded-md border border-line px-2.5 py-1.5 text-xs font-semibold text-muted hover:text-chalk"
+              >
+                Editar
+              </button>
+            )}
+          </div>
+        )}
+      </div>
       {error && <p className="mt-2 text-center text-xs text-danger">{error}</p>}
     </div>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAdmin } from "@/components/AdminContext";
 import { useTournament } from "@/hooks/useTournament";
 import KnockoutMatchCard from "@/components/KnockoutMatchCard";
+import Escudo from "@/components/Escudo";
 
 export default function MataMataPage() {
   const { isAdmin } = useAdmin();
@@ -17,10 +18,12 @@ export default function MataMataPage() {
   }
 
   const totalJogos = matches.length;
-  const jogosFinalizados = matches.filter((m) => m.status === "finalizado").length;
+  const jogosFinalizados = matches.filter(
+    (m) => m.status === "finalizado",
+  ).length;
   const grupoCompleto = totalJogos > 0 && jogosFinalizados === totalJogos;
 
-  const nomeById = new Map(players.map((p) => [p._id, p.nome]));
+  const playerById = new Map(players.map((p) => [p._id, p]));
 
   async function gerarMataMata() {
     setError(null);
@@ -85,7 +88,8 @@ export default function MataMataPage() {
           Chaveamento
         </h1>
         <p className="mt-1 text-sm text-muted">
-          Empate no tempo normal vai para a prorrogação e, se persistir, para os pênaltis.
+          Empate no tempo normal vai para a prorrogação e, se persistir, para os
+          pênaltis.
         </p>
       </div>
 
@@ -96,8 +100,12 @@ export default function MataMataPage() {
             <KnockoutMatchCard
               key={k._id}
               match={k}
-              nomeMandante={k.mandanteId ? nomeById.get(k.mandanteId) ?? null : null}
-              nomeVisitante={k.visitanteId ? nomeById.get(k.visitanteId) ?? null : null}
+              mandante={
+                k.mandanteId ? (playerById.get(k.mandanteId) ?? null) : null
+              }
+              visitante={
+                k.visitanteId ? (playerById.get(k.visitanteId) ?? null) : null
+              }
               isAdmin={isAdmin}
               onSaved={refetch}
             />
@@ -111,8 +119,16 @@ export default function MataMataPage() {
           {final && (
             <KnockoutMatchCard
               match={final}
-              nomeMandante={final.mandanteId ? nomeById.get(final.mandanteId) ?? null : null}
-              nomeVisitante={final.visitanteId ? nomeById.get(final.visitanteId) ?? null : null}
+              mandante={
+                final.mandanteId
+                  ? (playerById.get(final.mandanteId) ?? null)
+                  : null
+              }
+              visitante={
+                final.visitanteId
+                  ? (playerById.get(final.visitanteId) ?? null)
+                  : null
+              }
               isAdmin={isAdmin}
               onSaved={refetch}
             />
@@ -123,8 +139,16 @@ export default function MataMataPage() {
           {terceiro && (
             <KnockoutMatchCard
               match={terceiro}
-              nomeMandante={terceiro.mandanteId ? nomeById.get(terceiro.mandanteId) ?? null : null}
-              nomeVisitante={terceiro.visitanteId ? nomeById.get(terceiro.visitanteId) ?? null : null}
+              mandante={
+                terceiro.mandanteId
+                  ? (playerById.get(terceiro.mandanteId) ?? null)
+                  : null
+              }
+              visitante={
+                terceiro.visitanteId
+                  ? (playerById.get(terceiro.visitanteId) ?? null)
+                  : null
+              }
               isAdmin={isAdmin}
               onSaved={refetch}
             />
@@ -133,12 +157,19 @@ export default function MataMataPage() {
       </section>
 
       {final?.status === "finalizado" && (
-        <section className="rounded-2xl border border-amber/40 bg-amber/10 p-6 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest2 text-amber">
+        <section className="rounded-2xl border border-amber/40 bg-amber/10 p-6 text-center flex flex-col items-center justify-center">
+          <p className="text-xs font-bold uppercase tracking-widest2 text-amber mb-3">
             Campeão do torneio
           </p>
-          <p className="mt-1 font-display text-4xl tracking-wide text-chalk">
-            {nomeById.get(final.vencedorId ?? "") ?? "—"}
+
+          <Escudo
+            escudoUrl={playerById.get(final.vencedorId ?? "")?.escudoUrl}
+            size={60}
+            rotulo={playerById.get(final.vencedorId ?? "")?.time as string}
+          />
+
+          <p className="mt-1 font-display text-4xl tracking-wide text-chalk mt-3">
+            {playerById.get(final.vencedorId ?? "")?.nome ?? "—"}
           </p>
         </section>
       )}

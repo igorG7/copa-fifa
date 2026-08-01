@@ -22,6 +22,11 @@ estádio à noite / placar de jogo.
 6. No mata-mata, empate no tempo normal libera os campos de prorrogação;
    empate na prorrogação libera os pênaltis. Vencedores e perdedores das
    semis avançam automaticamente para a final e a disputa de 3º lugar.
+7. O admin pode vincular um time (com escudo) a cada jogador, escolhendo de
+   uma lista de clubes famosos (com escudo público já pronto) ou colando o
+   link de uma imagem própria. O escudo aparece ao lado do nome na tabela,
+   nos jogos e no chaveamento. Se o link de uma imagem falhar, o app mostra
+   as iniciais do time no lugar — nunca quebra a tela.
 
 ## Configuração local
 

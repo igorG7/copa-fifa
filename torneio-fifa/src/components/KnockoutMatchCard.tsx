@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { KnockoutMatch } from "@/lib/types";
+import { KnockoutMatch, Player } from "@/lib/types";
+import Escudo from "./Escudo";
 
 const faseLabel: Record<KnockoutMatch["fase"], string> = {
   semifinal: "Semifinal",
@@ -11,14 +12,14 @@ const faseLabel: Record<KnockoutMatch["fase"], string> = {
 
 export default function KnockoutMatchCard({
   match,
-  nomeMandante,
-  nomeVisitante,
+  mandante,
+  visitante,
   isAdmin,
   onSaved,
 }: {
   match: KnockoutMatch;
-  nomeMandante: string | null;
-  nomeVisitante: string | null;
+  mandante: Player | null;
+  visitante: Player | null;
   isAdmin: boolean;
   onSaved: () => void;
 }) {
@@ -41,7 +42,10 @@ export default function KnockoutMatchCard({
   async function salvar() {
     setSaving(true);
     setError(null);
-    const body: Record<string, number> = { golsMandante: gm, golsVisitante: gv };
+    const body: Record<string, number> = {
+      golsMandante: gm,
+      golsVisitante: gv,
+    };
     if (empateNormal) {
       body.golsProrrogacaoMandante = pm;
       body.golsProrrogacaoVisitante = pv;
@@ -87,7 +91,7 @@ export default function KnockoutMatchCard({
 
       <div className="flex items-center justify-between gap-3">
         <Nome
-          nome={nomeMandante}
+          player={mandante}
           origem={match.origemMandante}
           vencedor={jogado && match.vencedorId === match.mandanteId}
           alinhamento="right"
@@ -115,15 +119,21 @@ export default function KnockoutMatchCard({
             />
           ) : (
             <div className="flex items-center gap-1.5">
-              <Digito valor={jogado ? match.golsMandante : "–"} vivo={!jogado} />
+              <Digito
+                valor={jogado ? match.golsMandante : "–"}
+                vivo={!jogado}
+              />
               <span className="text-muted">×</span>
-              <Digito valor={jogado ? match.golsVisitante : "–"} vivo={!jogado} />
+              <Digito
+                valor={jogado ? match.golsVisitante : "–"}
+                vivo={!jogado}
+              />
             </div>
           )}
         </div>
 
         <Nome
-          nome={nomeVisitante}
+          player={visitante}
           origem={match.origemVisitante}
           vencedor={jogado && match.vencedorId === match.visitanteId}
           alinhamento="left"
@@ -157,39 +167,57 @@ export default function KnockoutMatchCard({
 }
 
 function Nome({
-  nome,
+  player,
   origem,
   vencedor,
   alinhamento,
 }: {
-  nome: string | null;
+  player: Player | null;
   origem: string;
   vencedor: boolean;
   alinhamento: "left" | "right";
 }) {
-  return (
-    <div
-      className={`min-w-0 flex-1 text-sm ${
-        alinhamento === "right" ? "text-right" : "text-left"
-      }`}
-    >
-      <p
-        className={`truncate ${
-          vencedor ? "font-bold text-amber" : "text-chalk"
+  if (!player) {
+    return (
+      <div
+        className={`min-w-0 flex-1 text-sm ${
+          alinhamento === "right" ? "text-right" : "text-left"
         }`}
       >
-        {nome ?? origem}
-      </p>
-      {!nome && (
         <p className="text-[10px] uppercase tracking-widest2 text-muted">
           {origem}
         </p>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`flex min-w-0 flex-1 items-center gap-2 ${
+        alinhamento === "right" ? "flex-row-reverse text-right" : "text-left"
+      }`}
+    >
+      <Escudo
+        escudoUrl={player.escudoUrl}
+        rotulo={player.time || player.nome}
+        size={45}
+      />
+      <span
+        className={`truncate text-sm ${vencedor ? "font-bold text-amber" : "text-chalk"}`}
+      >
+        {player.nome}
+      </span>
     </div>
   );
 }
 
-function Digito({ valor, vivo }: { valor: number | string | null; vivo: boolean }) {
+function Digito({
+  valor,
+  vivo,
+}: {
+  valor: number | string | null;
+  vivo: boolean;
+}) {
   return (
     <span
       className={`scoreboard-digit${vivo ? "-live" : ""} flex h-9 w-11 items-center justify-center rounded-md font-mono text-base font-bold ${

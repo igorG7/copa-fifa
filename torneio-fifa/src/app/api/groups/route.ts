@@ -71,8 +71,17 @@ export async function POST(request: Request) {
 
   const ids = players.map((p) => p._id.toString());
   const embaralhados = shuffle(ids);
-  const grupoA = embaralhados.slice(0, 4);
-  const grupoB = embaralhados.slice(4, 8);
+
+  // Intercala o destino: 1º sorteado -> A, 2º -> B, 3º -> A, 4º -> B...
+  const grupoA: string[] = [];
+  const grupoB: string[] = [];
+  const ordem: { playerId: string; grupo: "A" | "B" }[] = [];
+  embaralhados.forEach((id, i) => {
+    const grupo: "A" | "B" = i % 2 === 0 ? "A" : "B";
+    if (grupo === "A") grupoA.push(id);
+    else grupoB.push(id);
+    ordem.push({ playerId: id, grupo });
+  });
 
   await db.collection("groups").deleteMany({});
   await db.collection("matches").deleteMany({});
@@ -104,5 +113,6 @@ export async function POST(request: Request) {
       nome: g.nome,
       jogadores: g.jogadores,
     })),
+    ordem,
   });
 }

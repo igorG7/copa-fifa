@@ -1,6 +1,8 @@
 export interface Player {
   _id: string;
   nome: string;
+  time?: string;
+  escudoUrl?: string;
 }
 
 export type GroupName = "A" | "B";

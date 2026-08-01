@@ -6,7 +6,12 @@ import { isAdminFromRequest } from "@/lib/auth";
 export async function GET() {
   const db = await getDb();
   const players = await db.collection("players").find().toArray();
-  const data = players.map((p) => ({ _id: p._id.toString(), nome: p.nome }));
+  const data = players.map((p) => ({
+    _id: p._id.toString(),
+    nome: p.nome,
+    time: p.time ?? null,
+    escudoUrl: p.escudoUrl ?? null,
+  }));
   return NextResponse.json({ players: data });
 }
 
