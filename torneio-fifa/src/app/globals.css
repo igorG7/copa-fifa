@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: #0b1210;
+  color: #f2f5f0;
+}
+
+body {
+  min-height: 100dvh;
+  background-image: radial-gradient(
+      ellipse 90% 55% at 50% -12%,
+      rgba(242, 183, 5, 0.1),
+      transparent 60%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(242, 245, 240, 0.025) 0px,
+      rgba(242, 245, 240, 0.025) 1px,
+      transparent 1px,
+      transparent 72px
+    );
+}
+
+* {
+  border-color: #24352e;
+}
+
+::selection {
+  background-color: #f2b705;
+  color: #0b1210;
+}
+
+:focus-visible {
+  outline: 2px solid #f2b705;
+  outline-offset: 2px;
+}
+
+/* Placar estilo estádio: dígitos tabulares num "vidro" escuro com leve brilho */
+.scoreboard-digit {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  background: linear-gradient(180deg, #0e1a15 0%, #0a1210 100%);
+  border: 1px solid #2c4137;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(242, 245, 240, 0.04);
+}
+
+.scoreboard-digit-live {
+  border-color: #f2b705;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(242, 183, 5, 0.35),
+    0 0 18px rgba(242, 183, 5, 0.18);
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+@keyframes pulse-amber {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.pulse-live {
+  animation: pulse-amber 1.8s ease-in-out infinite;
+}
